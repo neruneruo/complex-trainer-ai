@@ -1,0 +1,21 @@
+pre-commit:
+  parallel: true
+  commands:
+    lint:
+      glob: "*.{ts,tsx,js,jsx,json,css}"
+      run: npx biome check --no-errors-on-unmatched --files-ignore-unknown=true {staged_files}
+    format:
+      glob: "*.{ts,tsx,js,jsx,json,css}"
+      run: npx biome format --no-errors-on-unmatched --files-ignore-unknown=true {staged_files}
+    typecheck:
+      glob: "*.{ts,tsx}"
+      run: npx tsc --noEmit
+    trivy:
+      run: >
+        trivy fs --scanners secret --exit-code 1
+        --skip-dirs .venv --skip-dirs node_modules --skip-dirs .git --skip-dirs "**/.terraform"
+        --skip-dirs src-tauri/target
+        --skip-files .env
+        .
+    test:
+      run: npm test
